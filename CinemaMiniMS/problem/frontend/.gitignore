@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+# Public configuration for this demo frontend project.
+!.env
+*.log
+.npm-cache/
+.npm-global/

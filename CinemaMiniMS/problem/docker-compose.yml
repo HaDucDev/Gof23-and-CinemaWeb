@@ -1,0 +1,42 @@
+# One PostgreSQL container for this stack; Choreography has its own container.
+# Private schemas/roles: account/cinema_account, booking/cinema_booking,
+# seat/cinema_seat, payment/cinema_payment. Each role accesses only its own schema.
+# Run khoi-tao-data.bat in this directory to create roles, schemas, grants and seed data.
+# compose up alone does not run SQL. See problem/README.md.
+# Explicit demo credentials live here; application projects configure their own connections.
+name: cinema-problem
+
+services:
+  postgres:
+    image: postgres:17.11-alpine3.24
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cinema_problem
+      # Administrator for initialization only; application services use their own roles.
+      POSTGRES_USER: cinema_admin
+      POSTGRES_PASSWORD: ProblemAdminLocal123!
+      # 00-roles.sql reads these explicit demo passwords from the PostgreSQL container.
+      # Each service independently declares its matching DB_PASSWORD in its own .env.
+      ACCOUNT_DB_PASSWORD: ProblemAccountLocal123!
+      BOOKING_DB_PASSWORD: ProblemBookingLocal123!
+      SEAT_DB_PASSWORD: ProblemSeatLocal123!
+      PAYMENT_DB_PASSWORD: ProblemPaymentLocal123!
+      # Use khoi-tao-data.bat -StartDate YYYY-MM-DD to select a new seed date.
+      SEED_START_DATE: ""
+      TZ: Asia/Ho_Chi_Minh
+      PGTZ: Asia/Ho_Chi_Minh
+    command: ["postgres", "-c", "timezone=Asia/Ho_Chi_Minh"]
+    ports:
+      - "127.0.0.1:50104:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database:/opt/cinema/database:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 15s
+
+volumes:
+  postgres-data:

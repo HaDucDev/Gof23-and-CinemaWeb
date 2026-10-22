@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Đăng nhập')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space auth-wrap">
+      <section class="auth-story">
+        <p class="eyebrow">CHÀO MỪNG TRỞ LẠI</p>
+        <h1>
+          Câu chuyện mới
+          <br />
+          đang chờ bạn.
+        </h1>
+        <p>Đăng nhập để chọn ghế yêu thích và lưu những cuộc hẹn điện ảnh của riêng mình.</p>
+        <div class="auth-illustration" aria-hidden="true">
+          ✦
+          <span>
+            cinema
+            <br />
+            is a feeling.
+          </span>
+        </div>
+      </section>
+      <section class="surface auth-card">
+        <h2>Đăng nhập</h2>
+        <p class="muted">Rất vui được gặp lại bạn.</p>
+        <div th:if="${param.error}" class="alert alert-danger">
+          Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị khóa.
+        </div>
+        <div th:if="${param.registered}" class="alert alert-success">
+          Đăng ký thành công. Bạn có thể đăng nhập ngay.
+        </div>
+        <form th:action="@{/login}" method="post" data-submit-lock>
+          <label class="form-label" for="email">Email</label>
+          <input
+            class="form-control mb-3"
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            maxlength="254"
+            required
+            autofocus
+          />
+          <label class="form-label" for="password">Mật khẩu</label>
+          <input
+            class="form-control mb-2"
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+          <div class="form-check mb-4">
+            <input
+              class="form-check-input"
+              id="show-password"
+              type="checkbox"
+              data-password-toggle="password"
+              aria-controls="password"
+              autocomplete="off"
+            />
+            <label class="form-check-label" for="show-password">Hiển thị mật khẩu</label>
+          </div>
+          <button class="btn btn-primary w-100">Đăng nhập</button>
+        </form>
+        <p class="mt-4 mb-0 muted">
+          Chưa có tài khoản?
+          <a th:href="@{/register}">Đăng ký</a>
+        </p>
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

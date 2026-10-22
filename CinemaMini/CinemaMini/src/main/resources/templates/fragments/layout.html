@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="head(title)">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" th:if="${_csrf != null}" th:content="${_csrf.token}" />
+    <meta name="csrf-header" th:if="${_csrf != null}" th:content="${_csrf.headerName}" />
+    <title th:text="${title + ' • CinemaMini'}">CinemaMini</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/5.3.8/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <script defer th:src="@{/vendor/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+    <script defer th:src="@{/js/app.js}"></script>
+  </head>
+  <body>
+    <header
+      th:fragment="nav"
+      class="site-header"
+      th:with="loggedIn=${loggedIn == true},admin=${admin == true}"
+      th:attr="data-authenticated=${loggedIn}"
+    >
+      <nav class="container nav-bar" aria-label="Điều hướng chính">
+        <a class="brand" th:href="@{/movies}">
+          <span class="brand-mark">
+            C
+            <span>m</span>
+          </span>
+          <span>
+            CinemaMini
+            <small>Một chỗ ngồi. Một câu chuyện.</small>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a th:href="@{/movies}">Phim &amp; suất chiếu</a>
+          <a th:if="${loggedIn and not admin}" th:href="@{/bookings}">Vé của tôi</a>
+          <a th:if="${admin}" th:href="@{/admin/showtimes}">Quản lý suất</a>
+          <a th:if="${admin}" th:href="@{/admin/payments}">Giao dịch</a>
+          <details th:if="${loggedIn}" class="notification-panel">
+            <summary>
+              Thông báo
+              <span id="notification-count" class="notification-count">0</span>
+            </summary>
+            <div class="notification-dropdown">
+              <strong>Thông báo mới nhất</strong>
+              <div id="notification-list" aria-live="polite"><p class="muted">Đang tải…</p></div>
+            </div>
+          </details>
+          <span
+            th:if="${loggedIn}"
+            class="account-name"
+            th:text="${admin ? 'Admin' : currentCustomer.fullName}"
+          ></span>
+          <form th:if="${loggedIn}" th:action="@{/logout}" method="post">
+            <button class="btn btn-sm btn-outline-secondary">Đăng xuất</button>
+          </form>
+          <a th:unless="${loggedIn}" class="btn btn-sm btn-outline-dark" th:href="@{/login}">
+            Đăng nhập
+          </a>
+          <a th:unless="${loggedIn}" class="btn btn-sm btn-primary" th:href="@{/register}">
+            Đăng ký
+          </a>
+        </div>
+      </nav>
+    </header>
+    <footer th:fragment="footer" class="site-footer">
+      <div class="container d-flex justify-content-between flex-wrap gap-2">
+        <span>
+          CinemaMini
+          <span class="muted">/ Phòng 01</span>
+        </span>
+        <span class="muted">30 chỗ ngồi dành cho những câu chuyện lớn.</span>
+      </div>
+    </footer>
+  </body>
+</html>

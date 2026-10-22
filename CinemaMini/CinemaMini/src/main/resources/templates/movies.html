@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Phim & suất chiếu')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">RẠP NHỎ · TRẢI NGHIỆM TRỌN VẸN</p>
+          <h1>
+            Mỗi bộ phim,
+            <br />
+            một cuộc hẹn mới.
+          </h1>
+          <p>
+            Chọn câu chuyện bạn yêu thích.
+            <br />
+            Chúng mình giữ cho bạn một chỗ thật vừa ý.
+          </p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit"></div>
+          <div class="ticket-shape">
+            CINEMA
+            <br />
+            <span>MINI</span>
+            <hr />
+            PHÒNG 01 / 30 GHẾ
+          </div>
+          <span class="spark">✦</span>
+        </div>
+      </section>
+      <div class="section-title" id="movie-list">
+        <div>
+          <p class="eyebrow">ĐANG MỞ BÁN</p>
+          <h2>Hẹn gặp bạn ở rạp</h2>
+        </div>
+        <span class="muted">Giờ Việt Nam · Asia/Ho_Chi_Minh</span>
+      </div>
+      <div th:if="${#lists.isEmpty(cards)}" class="empty-state">
+        Chưa có dữ liệu phim. Hãy chuẩn bị database theo hướng dẫn của dự án.
+      </div>
+      <div class="row g-4">
+        <article class="col-lg-4 col-md-6" th:each="card, state : ${cards}">
+          <div class="movie-card">
+            <div th:class="'movie-art art-' + ${state.index % 3}">
+              <span
+                class="movie-index"
+                th:text="${#numbers.formatInteger(moviePage.pageable.offset + state.count, 2)}"
+              ></span>
+              <div class="poster-shape" aria-hidden="true"></div>
+              <div class="poster-title" th:text="${card.movie.title}"></div>
+              <small>CINEMAMINI ORIGINAL STORIES</small>
+            </div>
+            <div class="movie-body">
+              <div class="d-flex justify-content-between">
+                <span class="eyebrow">PHIM TRUYỆN</span>
+                <span class="muted" th:text="${card.movie.durationMinutes + ' phút'}"></span>
+              </div>
+              <h3 th:text="${card.movie.title}"></h3>
+              <p class="movie-description" th:text="${card.movie.description}"></p>
+              <div class="showtime-list">
+                <a
+                  class="showtime-chip"
+                  th:each="show : ${card.showtimes}"
+                  th:href="@{/showtimes/{id}/seats(id=${show.id})}"
+                >
+                  <strong th:text="${@display.time(show.startsAt)}"></strong>
+                  <small th:text="${@display.day(show.startsAt)}"></small>
+                </a>
+                <p class="muted" th:if="${#lists.isEmpty(card.showtimes)}">
+                  Chưa có suất chiếu sắp tới.
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+      <nav
+        class="movie-pagination"
+        th:if="${moviePage.totalPages > 1}"
+        aria-label="Phân trang danh sách phim"
+      >
+        <p
+          class="muted"
+          th:text="${'Trang ' + (moviePage.number + 1) + ' / ' + moviePage.totalPages + ' · ' + moviePage.totalElements + ' bộ phim'}"
+        ></p>
+        <ul class="pagination justify-content-center flex-wrap">
+          <li class="page-item" th:classappend="${moviePage.first} ? 'disabled'">
+            <span class="page-link" th:if="${moviePage.first}" aria-disabled="true">Trước</span>
+            <a
+              class="page-link"
+              th:unless="${moviePage.first}"
+              th:href="@{/movies(page=${moviePage.number})} + '#movie-list'"
+              rel="prev"
+            >
+              Trước
+            </a>
+          </li>
+          <li class="page-item" th:if="${startPage > 1}">
+            <a class="page-link" th:href="@{/movies(page=1)} + '#movie-list'" aria-label="Trang 1">
+              1
+            </a>
+          </li>
+          <li class="page-item disabled" th:if="${startPage > 2}">
+            <span class="page-link" aria-hidden="true">…</span>
+          </li>
+          <li
+            class="page-item"
+            th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+            th:classappend="${pageNumber == moviePage.number + 1} ? 'active'"
+          >
+            <span
+              class="page-link"
+              th:if="${pageNumber == moviePage.number + 1}"
+              aria-current="page"
+              th:text="${pageNumber}"
+            ></span>
+            <a
+              class="page-link"
+              th:unless="${pageNumber == moviePage.number + 1}"
+              th:href="@{/movies(page=${pageNumber})} + '#movie-list'"
+              th:aria-label="${'Trang ' + pageNumber}"
+              th:text="${pageNumber}"
+            ></a>
+          </li>
+          <li class="page-item disabled" th:if="${endPage < moviePage.totalPages - 1}">
+            <span class="page-link" aria-hidden="true">…</span>
+          </li>
+          <li class="page-item" th:if="${endPage < moviePage.totalPages}">
+            <a
+              class="page-link"
+              th:href="@{/movies(page=${moviePage.totalPages})} + '#movie-list'"
+              th:aria-label="${'Trang ' + moviePage.totalPages}"
+              th:text="${moviePage.totalPages}"
+            ></a>
+          </li>
+          <li class="page-item" th:classappend="${moviePage.last} ? 'disabled'">
+            <span class="page-link" th:if="${moviePage.last}" aria-disabled="true">Sau</span>
+            <a
+              class="page-link"
+              th:unless="${moviePage.last}"
+              th:href="@{/movies(page=${moviePage.number + 2})} + '#movie-list'"
+              rel="next"
+            >
+              Sau
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

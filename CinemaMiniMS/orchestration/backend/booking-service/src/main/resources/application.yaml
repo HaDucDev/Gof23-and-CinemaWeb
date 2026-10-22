@@ -1,0 +1,97 @@
+# Load this service's .env when launched from IntelliJ, Maven or java -jar.
+# Environment variables and command-line arguments can still override file values.
+# Each service writes its own file when launched directly from IntelliJ.
+# Relative to the Run Configuration working directory (repository root recommended).
+logging:
+  file:
+    name: logs/orchestration/booking.log
+  # Hiện file Java và số dòng trên cả IntelliJ lẫn file log.
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{60} [%file:%line] : %msg%n%wEx"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{60} [%file:%line] : %msg%n%wEx"
+server:
+  address: ${SERVICE_BIND_ADDRESS:0.0.0.0}
+  port: ${SERVER_PORT:8082}
+  servlet:
+    session:
+      cookie:
+        name: CINEMA_ORCH_SESSION
+        http-only: true
+        same-site: lax
+        secure: ${SESSION_COOKIE_SECURE:false}
+      timeout: 30m
+  error:
+    include-message: never
+    include-stacktrace: never
+spring:
+  config:
+    import:
+      - "optional:file:./orchestration/backend/booking-service/.env[.properties]"
+      - "optional:file:./backend/booking-service/.env[.properties]"
+      - "optional:file:./booking-service/.env[.properties]"
+      - "optional:file:./.env[.properties]"
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
+  application:
+    name: cinema-orch-booking
+  datasource:
+    url: ${DB_URL}
+    username: cinema_booking
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 5000
+      connection-init-sql: SET TIME ZONE 'Asia/Ho_Chi_Minh'
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: booking
+        jdbc:
+          time_zone: UTC
+  sql:
+    init:
+      mode: never
+  mvc:
+    async:
+      request-timeout: 1200000
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+cinema:
+  schema: booking
+  internal-key: ${INTERNAL_API_KEY}
+  account-url: ${ACCOUNT_SERVICE_URL}
+  seat-url: ${SEAT_SERVICE_URL}
+  payment-url: ${PAYMENT_SERVICE_URL}
+  frontend-origins: ${FRONTEND_ORIGINS}
+  saga:
+    recovery:
+      # Chỉ tiếp tục tự động cho CANCEL_PAID; mỗi bước có số lần thử tối đa riêng.
+      scan-delay-ms: ${SAGA_SCAN_DELAY_MS:2000}
+      retry-delay-ms: ${SAGA_RETRY_DELAY_MS:5000}
+      lease-ms: ${SAGA_LEASE_MS:60000}
+      max-attempts: ${SAGA_MAX_ATTEMPTS:120}
+      batch-size: ${SAGA_BATCH_SIZE:20}
+  http:
+    connect-timeout-ms: ${HTTP_CONNECT_TIMEOUT_MS:3000}
+    read-timeout-ms: ${HTTP_READ_TIMEOUT_MS:10000}
+    stream-read-timeout-ms: ${STREAM_READ_TIMEOUT_MS:30000}
+---
+# Explicit opt-in for several independent processes on one development machine.
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://127.0.0.1:50102/cinema_orchestration}
+server:
+  address: ${SERVICE_BIND_ADDRESS:127.0.0.1}
+cinema:
+  account-url: ${ACCOUNT_SERVICE_URL:http://127.0.0.1:8091}
+  seat-url: ${SEAT_SERVICE_URL:http://127.0.0.1:8092}
+  payment-url: ${PAYMENT_SERVICE_URL:http://127.0.0.1:8093}
+  frontend-origins: ${FRONTEND_ORIGINS:http://localhost:5174,http://127.0.0.1:5174}

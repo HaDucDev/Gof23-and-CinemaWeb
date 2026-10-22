@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Chọn ghế')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main
+      id="seat-app"
+      class="container page-space"
+      th:attr="data-showtime-id=${showtime.id},data-can-book=${loggedIn and not admin and not started},data-account=${loggedIn ? currentAccount.id : 'guest'}"
+    >
+      <a class="back-link" th:href="@{/movies}">← Phim &amp; suất chiếu</a>
+      <div class="section-title mt-3">
+        <div>
+          <p class="eyebrow">CHỌN CHỖ NGỒI CỦA BẠN</p>
+          <h1 class="page-title" th:text="${movie.title}"></h1>
+          <p class="muted">
+            <span th:text="${@display.date(showtime.startsAt)}"></span>
+            · Phòng 01 ·
+            <span th:text="${movie.durationMinutes}"></span>
+            phút
+          </p>
+        </div>
+        <span id="seat-connection" class="connection-status" role="status">Đang kết nối…</span>
+      </div>
+      <div th:if="${started}" class="alert alert-warning">
+        Suất chiếu đã bắt đầu, không nhận đặt vé mới.
+      </div>
+      <div id="seat-message" class="alert alert-info" hidden role="status"></div>
+      <div class="row g-4">
+        <section class="col-lg-8">
+          <div class="surface auditorium">
+            <div class="screen">MÀN HÌNH</div>
+            <div id="seat-grid" class="seat-grid" aria-label="Sơ đồ ghế">Đang tải ghế…</div>
+            <div class="seat-legend">
+              <span>
+                <i class="legend-dot"></i>
+                Còn trống
+              </span>
+              <span>
+                <i class="legend-dot vip"></i>
+                VIP
+              </span>
+              <span>
+                <i class="legend-dot mine"></i>
+                Bạn đang giữ
+              </span>
+              <span>
+                <i class="legend-dot held"></i>
+                Người khác giữ
+              </span>
+              <span>
+                <i class="legend-dot booked"></i>
+                Đã bán
+              </span>
+              <span>
+                <i class="legend-dot disabled"></i>
+                Không mở bán
+              </span>
+            </div>
+            <p class="muted text-center small mt-3 mb-0">A–C: ghế thường · D–E: ghế VIP</p>
+          </div>
+        </section>
+        <aside class="col-lg-4">
+          <div class="surface booking-summary">
+            <p class="eyebrow">LỰA CHỌN CỦA BẠN</p>
+            <h3 id="selected-seats">Chưa chọn ghế</h3>
+            <p id="hold-clock" class="hold-clock" aria-live="polite">Giữ ghế tối đa 5 phút</p>
+            <div class="price-row">
+              <span>Tạm tính</span>
+              <strong id="quote-subtotal">0 đ</strong>
+            </div>
+            <div class="price-row">
+              <span>
+                Ưu đãi
+                <span
+                  th:if="${loggedIn and not admin}"
+                  th:text="${'(' + currentCustomer.customerType.label + ')'}"
+                ></span>
+              </span>
+              <span id="quote-discount">0 đ</span>
+            </div>
+            <div class="price-row total">
+              <span>Thành tiền</span>
+              <strong id="quote-total">0 đ</strong>
+            </div>
+            <p class="muted small">
+              Ghế thường
+              <span th:text="${@display.money(showtime.basePrice)}"></span>
+              · VIP
+              <span
+                th:text="${@display.money(showtime.basePrice.add(showtime.vipSurcharge))}"
+              ></span>
+            </p>
+            <div th:unless="${loggedIn}" class="mt-3">
+              <p class="muted">Đăng nhập để giữ ghế và đặt vé.</p>
+              <a class="btn btn-primary w-100" th:href="@{/login}">Đăng nhập</a>
+            </div>
+            <p th:if="${admin}" class="muted">Dùng tài khoản khách hàng để đặt vé.</p>
+            <form
+              th:if="${loggedIn and not admin}"
+              id="seat-form"
+              th:action="@{/bookings}"
+              method="post"
+            >
+              <input type="hidden" name="showtimeId" th:value="${showtime.id}" />
+              <input type="hidden" name="requestKey" th:value="${requestKey}" />
+              <input type="hidden" name="holdId" />
+              <input type="hidden" name="holdToken" />
+              <input type="hidden" name="revision" />
+              <input type="hidden" name="seatIds" />
+              <label class="form-label" for="contactName">Tên người nhận</label>
+              <input
+                class="form-control mb-3"
+                id="contactName"
+                name="contactName"
+                th:value="${currentCustomer.fullName}"
+                maxlength="120"
+                required
+              />
+              <label class="form-label" for="contactEmail">Email liên hệ</label>
+              <input
+                class="form-control mb-3"
+                id="contactEmail"
+                name="contactEmail"
+                type="email"
+                th:value="${currentAccount.email}"
+                maxlength="254"
+                required
+              />
+              <label class="form-label" for="contactPhone">
+                Điện thoại
+                <span class="muted">(tùy chọn)</span>
+              </label>
+              <input
+                class="form-control mb-3"
+                id="contactPhone"
+                name="contactPhone"
+                type="tel"
+                maxlength="30"
+              />
+              <label class="form-label" for="note">
+                Ghi chú
+                <span class="muted">(tùy chọn)</span>
+              </label>
+              <textarea
+                class="form-control mb-3"
+                id="note"
+                name="note"
+                maxlength="1000"
+                rows="2"
+              ></textarea>
+              <button id="checkout-button" class="btn btn-primary w-100" disabled>
+                Tạo đơn &amp; thanh toán →
+              </button>
+              <button id="release-button" class="btn btn-link w-100 mt-2" type="button" disabled>
+                Trả toàn bộ ghế
+              </button>
+            </form>
+            <a id="continue-checkout" class="btn btn-primary w-100" hidden>Tiếp tục thanh toán</a>
+            <button id="retry-seat" type="button" class="btn btn-outline-dark w-100 mt-2" hidden>
+              Thử lại yêu cầu vừa gửi
+            </button>
+          </div>
+        </aside>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

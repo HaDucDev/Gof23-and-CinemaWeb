@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Vé của tôi')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">NHỮNG CUỘC HẸN CỦA BẠN</p>
+          <h1 class="page-title">Vé của tôi</h1>
+        </div>
+        <a class="btn btn-primary" th:href="@{/movies}">Đặt vé mới</a>
+      </div>
+      <div th:if="${#lists.isEmpty(rows)}" class="empty-state">
+        <h3>Chưa có cuộc hẹn nào</h3>
+        <p class="muted">Một câu chuyện mới đang chờ bạn ở rạp.</p>
+        <a th:href="@{/movies}">Khám phá phim →</a>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6" th:each="row : ${rows}">
+          <article class="surface p-4 h-100">
+            <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+              <span class="eyebrow" th:text="${row.booking.code}"></span>
+              <span
+                th:class="'status-badge ' + ${row.booking.status.name()}"
+                th:text="${row.booking.status.label}"
+              ></span>
+            </div>
+            <h3 th:text="${row.movie.title}"></h3>
+            <p class="muted" th:text="${@display.date(row.showtime.startsAt) + ' · Phòng 01'}"></p>
+            <p>
+              Ghế
+              <strong
+                th:each="item, state : ${row.items}"
+                th:text="${item.seatCodeSnapshot + (state.last ? '' : ', ')}"
+              ></strong>
+            </p>
+            <div class="d-flex justify-content-between align-items-center">
+              <strong th:text="${@display.money(row.booking.total)}"></strong>
+              <a
+                class="btn btn-outline-dark btn-sm"
+                th:href="@{/bookings/{id}(id=${row.booking.id})}"
+              >
+                Xem chi tiết →
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

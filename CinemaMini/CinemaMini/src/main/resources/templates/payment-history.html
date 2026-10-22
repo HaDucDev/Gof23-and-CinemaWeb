@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Lịch sử giao dịch')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space">
+      <p class="eyebrow">THU VÀ HOÀN TIỀN</p>
+      <h1 class="page-title mb-4">Lịch sử giao dịch</h1>
+      <form
+        th:if="${admin}"
+        th:action="@{/admin/payments}"
+        method="get"
+        class="surface p-3 mb-4 d-flex flex-wrap gap-3"
+      >
+        <input
+          class="form-control filter-input"
+          name="bookingCode"
+          th:value="${bookingCode}"
+          placeholder="Tìm mã đơn"
+          aria-label="Mã đơn"
+        />
+        <select name="operation" class="form-select filter-input" aria-label="Loại giao dịch">
+          <option value="">Tất cả giao dịch</option>
+          <option value="PAYMENT" th:selected="${operation == 'PAYMENT'}">Thanh toán</option>
+          <option value="REFUND" th:selected="${operation == 'REFUND'}">Hoàn tiền</option>
+        </select>
+        <button class="btn btn-primary">Lọc giao dịch</button>
+      </form>
+      <div class="surface p-4 table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>ID / Mã tham chiếu</th>
+              <th>Đơn</th>
+              <th>Loại</th>
+              <th>Phương thức</th>
+              <th>Số tiền</th>
+              <th>Giao dịch gốc</th>
+              <th>Thời gian</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="row : ${rows}">
+              <td>
+                <strong th:text="${'#' + row.payment.id}"></strong>
+                <small
+                  class="d-block muted reference-code"
+                  th:text="${row.payment.referenceCode}"
+                ></small>
+              </td>
+              <td>
+                <a
+                  th:href="${(admin ? '/admin/bookings/' : '/bookings/') + row.booking.id}"
+                  th:text="${row.booking.code}"
+                ></a>
+              </td>
+              <td
+                th:text="${row.payment.operationType == 'PAYMENT' ? 'Thanh toán' : 'Hoàn tiền'}"
+              ></td>
+              <td th:text="${row.payment.paymentMethod.label}"></td>
+              <td
+                th:class="${row.payment.amount.signum() &lt; 0 ? 'text-success' : ''}"
+                th:text="${@display.money(row.payment.amount)}"
+              ></td>
+              <td
+                th:text="${row.payment.originalPaymentId == null ? '—' : '#' + row.payment.originalPaymentId}"
+              ></td>
+              <td th:text="${@display.date(row.payment.createdAt)}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(rows)}">
+              <td colspan="7" class="muted text-center py-5">Chưa có giao dịch phù hợp.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

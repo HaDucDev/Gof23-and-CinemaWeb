@@ -1,0 +1,27 @@
+# Independent broker for Choreography; no PostgreSQL dependency.
+# Start with khoi-tao-rabbitmq.bat in this directory.
+name: cinema-rabbitmq
+
+services:
+  rabbitmq:
+    image: ${RABBITMQ_IMAGE:-rabbitmq:4.3.6-management-alpine}
+    hostname: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-cinema_mq}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in rabbitmq/.env}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST:-cinema}
+    ports:
+      - "127.0.0.1:${RABBITMQ_AMQP_PORT:-5672}:5672"
+      - "127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 10s
+      retries: 18
+      start_period: 20s
+
+volumes:
+  rabbitmq-data:

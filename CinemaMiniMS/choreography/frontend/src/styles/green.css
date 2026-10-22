@@ -1,0 +1,77 @@
+/* Preserve the MVC layout and CSS illustrations; give them the green color palette. */
+:root {
+  --ink: #173b2b;
+  --muted: #667c70;
+  --paper: #f3f8f4;
+  --line: #dbe8df;
+  --accent: #198754;
+  --accent-dark: #12683f;
+  --green: #23734d;
+  --bs-primary: #198754;
+  --bs-primary-rgb: 25, 135, 84;
+}
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+.site-header, .site-footer { background: #fcfefc; }
+.brand-mark { color: #fff; }
+.nav-links > a.active:not(.btn) { color: var(--accent); font-weight: 700; }
+.btn-primary { --bs-btn-bg: var(--accent); --bs-btn-border-color: var(--accent); --bs-btn-hover-bg: var(--accent-dark); --bs-btn-hover-border-color: var(--accent-dark); --bs-btn-active-bg: var(--accent-dark); --bs-btn-active-border-color: var(--accent-dark); }
+.btn-primary:disabled, .btn-primary.disabled { background: #91b7a1; border-color: #91b7a1; }
+.btn-outline-dark { --bs-btn-color: var(--ink); --bs-btn-border-color: #c4d9cd; --bs-btn-hover-bg: var(--accent); --bs-btn-hover-border-color: var(--accent); }
+.form-control:focus, .form-select:focus, .auth-card .form-check-input:focus { border-color: #73bc93; box-shadow: 0 0 0 .2rem #19875415; }
+.hero { background: #134d35; color: #f7fdf9; }
+.hero .eyebrow { color: #a3d8b7; }
+.hero p:last-child { color: #d0e8da; }
+.ticket-shape { background: #b6e4c7; color: #194f36; box-shadow: 12px 12px 0 #0c3524; }
+.orbit { border-color: #4e9471; }
+.spark { color: #83cf9c; }
+.art-0 { background: #38845d; }
+.art-0 .poster-shape { background: #b3e4c3; box-shadow: -80px 180px 0 50px #205b3f; }
+.art-0:after { background: #143d2a; border-left-color: #a9d1b8; }
+.art-1 { background: #244b39; }
+.art-1 .poster-shape { background: repeating-linear-gradient(0deg,#a9d1b8 0 3px,transparent 3px 23px),repeating-linear-gradient(90deg,#a9d1b8 0 3px,#123c2a 3px 23px); }
+.art-2 { background: #537e66; }
+.art-2 .poster-shape { background: #afd9bd; box-shadow: 20px 30px 0 #365e48; }
+.art-2:after { color: #e2f5e7; }
+.showtime-chip { background: #f6fcf7; }
+.screen { border-color: #abcdb8; color: #648a73; box-shadow: 0 -13px 23px -17px #4d9b70; }
+.seat-button, .legend-dot { --seat-bg: #e3f3e8; --seat-fg: #215a37; --seat-border: #5b9f73; }
+.seat-button.mine, .legend-dot.mine { --seat-bg: #198754; --seat-fg: #fff; --seat-border: #11643d; }
+.seat-button.mine { box-shadow: 0 0 0 3px #19875425; }
+.payment-method:has(input:checked) { background: #edf8f0; border-color: var(--accent); }
+.ticket-heading { background: #134d35; color: #f5fcf7; }
+.ticket-heading p { color: #cce8d5; }
+.notification-item.unread { background: #edf8f0; }
+.status-badge.PAYMENT_PROCESSING, .status-badge.CREATING, .status-badge.RUNNING { background: #e4f3e9; color: #246840; }
+.status-badge.COMPENSATING, .status-badge.CANCELLING { background: #fff0d7; color: #94631b; }
+.status-badge.FAILED_NEEDS_REVIEW, .status-badge.FAILED { background: #fce8e8; color: #aa2f3b; }
+.status-badge.COMPLETED, .status-badge.SUCCEEDED { background: #e2f0e7; color: #246748; }
+.loading-state { padding: 2.5rem 1rem; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: .7rem; }
+.booking-code { font-family: Consolas, monospace; font-size: .7rem; overflow-wrap: anywhere; letter-spacing: 0; }
+.ticket-code-block { border: 1px dashed #98c5a9; border-radius: 12px; background: #f2faf4; padding: 1.3rem; margin: 1.4rem 0; }
+.ticket-code-block strong { display: block; color: var(--accent); font-size: 1.5rem; overflow-wrap: anywhere; }
+.ticket-code-block small { color: var(--muted); }
+.invalid-ticket { background: #f3f4f6; border-color: #b8c0ca; }
+.invalid-ticket strong { text-decoration: line-through; color: var(--muted); }
+.saga-panel summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; cursor: pointer; }
+.saga-panel summary::before { content: '▾'; color: var(--accent); }
+.saga-panel:not([open]) summary::before { content: '▸'; }
+.saga-panel summary strong { flex: 1; }
+.saga-timeline { list-style: none; padding: 0 0 0 1.2rem; margin: 1.5rem 0 0; }
+.saga-timeline li { position: relative; border-left: 2px solid #d4e8da; padding: 0 0 1.4rem 1.5rem; font-size: .8rem; }
+.saga-timeline li::before { content: ''; width: 10px; height: 10px; position: absolute; left: -6px; top: 5px; border-radius: 50%; background: var(--accent); }
+.saga-timeline li:last-child { padding-bottom: 0; }
+.timeline-detail { margin: .5rem 0 0; padding: .8rem; border-radius: 8px; background: var(--paper); white-space: pre-wrap; overflow-wrap: anywhere; font-size: .7rem; }
+.simulation-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+.ledger-total { font-size: 1.6rem; color: var(--accent); }
+.limit-select { width: 120px; }
+.skip-link { position: fixed; left: 1rem; top: -100px; z-index: 100; padding: .75rem; background: #fff; border: 2px solid var(--accent); }
+.skip-link:focus { top: 1rem; }
+:focus-visible { outline: 3px solid #2a9c5e; outline-offset: 3px; }
+.alert { overflow-wrap: anywhere; }
+.notification-item a, dd { overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+  .simulation-panel { grid-template-columns: 1fr; gap: 1.2rem; }
+  .ledger-total { font-size: 1.3rem; }
+  .notification-dropdown { position: fixed; left: 5vw; top: 145px; width: 90vw; max-height: 60vh; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

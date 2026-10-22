@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Chi tiết đặt vé')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space narrow-page">
+      <a class="back-link" th:href="${admin ? '/admin/payments' : '/bookings'}">
+        ← Quay lại danh sách
+      </a>
+      <div class="section-title mt-3">
+        <div>
+          <p class="eyebrow" th:text="${booking.code}"></p>
+          <h1
+            class="page-title"
+            th:text="${booking.status.name() == 'CONFIRMED' ? 'Vé điện tử của bạn' : 'Chi tiết đặt vé'}"
+          ></h1>
+        </div>
+        <span
+          th:class="'status-badge ' + ${booking.status.name()}"
+          th:text="${booking.status.label}"
+        ></span>
+      </div>
+      <div class="surface ticket-detail">
+        <div class="ticket-heading">
+          <span class="brand-mark">Cm</span>
+          <div>
+            <h2 th:text="${movie.title}"></h2>
+            <p class="mb-0" th:text="${@display.date(showtime.startsAt) + ' · Phòng 01'}"></p>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="ticket-seats">
+            <span th:each="item : ${items}" th:text="${item.seatCodeSnapshot}"></span>
+          </div>
+          <dl class="row mt-4">
+            <dt class="col-sm-4">Người nhận</dt>
+            <dd class="col-sm-8" th:text="${booking.contactName}"></dd>
+            <dt class="col-sm-4">Email</dt>
+            <dd class="col-sm-8 text-break" th:text="${booking.contactEmail}"></dd>
+            <dt class="col-sm-4">Chính sách giá</dt>
+            <dd class="col-sm-8" th:text="${booking.pricingPolicySnapshot.label}"></dd>
+            <dt class="col-sm-4">Tạm tính</dt>
+            <dd class="col-sm-8" th:text="${@display.money(booking.subtotal)}"></dd>
+            <dt class="col-sm-4">Giảm giá</dt>
+            <dd class="col-sm-8" th:text="${@display.money(booking.discountAmount)}"></dd>
+          </dl>
+          <div class="price-row total">
+            <span>Giá trị đơn</span>
+            <strong th:text="${@display.money(booking.total)}"></strong>
+          </div>
+          <p class="muted small mt-3 mb-0" th:if="${booking.status.name() == 'PENDING'}">
+            Đơn đang chờ thanh toán, chưa có vé có hiệu lực.
+          </p>
+          <p
+            class="muted small mt-3 mb-0"
+            th:if="${booking.status.name() == 'CANCELLED' or booking.status.name() == 'EXPIRED'}"
+          >
+            Vé không còn hiệu lực. Bạn có thể bắt đầu một lượt đặt vé mới.
+          </p>
+        </div>
+      </div>
+      <div th:if="${not admin}" class="d-flex gap-3 flex-wrap my-4">
+        <a
+          th:if="${booking.status.name() == 'PENDING'}"
+          class="btn btn-primary"
+          th:href="@{/bookings/{id}/payment(id=${booking.id})}"
+        >
+          Tiếp tục thanh toán
+        </a>
+        <form
+          th:if="${canCancel}"
+          th:action="@{/bookings/{id}/cancel(id=${booking.id})}"
+          method="post"
+          data-submit-lock
+          data-confirm="Bạn muốn hủy đơn này? Vé đã thanh toán sẽ được hoàn toàn bộ theo phương thức gốc."
+        >
+          <input type="hidden" name="requestKey" th:value="${requestKey}" />
+          <button
+            class="btn btn-outline-danger"
+            th:text="${booking.status.name() == 'CONFIRMED' ? 'Hủy vé & hoàn tiền' : 'Hủy đơn'}"
+          ></button>
+        </form>
+      </div>
+      <section class="surface p-4 mt-4">
+        <h3>Lịch sử thanh toán</h3>
+        <div th:if="${#lists.isEmpty(payments)}" class="muted mt-3">
+          Đơn chưa có giao dịch thanh toán.
+        </div>
+        <div th:unless="${#lists.isEmpty(payments)}">
+          <div class="table-responsive">
+            <table class="table mt-3">
+              <thead>
+                <tr>
+                  <th>Thao tác</th>
+                  <th>Phương thức</th>
+                  <th>Số tiền</th>
+                  <th>Thời gian</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="payment : ${payments}">
+                  <td
+                    th:text="${payment.operationType == 'PAYMENT' ? 'Thanh toán' : 'Hoàn tiền'}"
+                  ></td>
+                  <td th:text="${payment.paymentMethod.label}"></td>
+                  <td
+                    th:class="${payment.amount.signum() &lt; 0 ? 'text-success' : ''}"
+                    th:text="${@display.money(payment.amount)}"
+                  ></td>
+                  <td th:text="${@display.date(payment.createdAt)}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="price-row">
+            <span>Đã thanh toán</span>
+            <strong th:text="${@display.money(paid)}"></strong>
+          </div>
+          <div class="price-row">
+            <span>Đã hoàn</span>
+            <strong th:text="${@display.money(refunded)}"></strong>
+          </div>
+          <div class="price-row total">
+            <span>Số tiền ròng</span>
+            <strong th:text="${@display.money(netPaid)}"></strong>
+          </div>
+          <a
+            th:if="${not admin}"
+            class="d-inline-block mt-3"
+            th:href="@{/bookings/{id}/payments(id=${booking.id})}"
+          >
+            Xem mã giao dịch →
+          </a>
+        </div>
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

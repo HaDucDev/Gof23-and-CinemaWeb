@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Thanh toán')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space narrow-page">
+      <p class="eyebrow">HOÀN TẤT CUỘC HẸN ĐIỆN ẢNH</p>
+      <h1 class="page-title">Thanh toán</h1>
+      <div class="surface p-4 mb-4">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+          <div>
+            <h3 th:text="${movie.title}"></h3>
+            <p class="muted" th:text="${@display.date(showtime.startsAt) + ' · Phòng 01'}"></p>
+          </div>
+          <span class="status-badge PENDING">Chờ thanh toán</span>
+        </div>
+        <p>
+          Mã đơn
+          <strong th:text="${booking.code}"></strong>
+        </p>
+        <p>
+          Ghế
+          <strong
+            th:each="item, state : ${items}"
+            th:text="${item.seatCodeSnapshot + (state.last ? '' : ', ')}"
+          ></strong>
+        </p>
+        <div class="price-row total">
+          <span>Tổng thanh toán</span>
+          <strong th:text="${@display.money(booking.total)}"></strong>
+        </div>
+        <p
+          class="hold-clock mt-3 mb-0 countdown"
+          th:attr="data-expires=${hold.expiresAt},data-server-time=${serverTime}"
+        >
+          Đang tính thời gian còn lại…
+        </p>
+      </div>
+      <form
+        th:action="@{/bookings/{id}/payments(id=${booking.id})}"
+        method="post"
+        class="surface p-4"
+        data-submit-lock
+        data-payment-form
+      >
+        <input type="hidden" name="requestKey" th:value="${requestKey}" />
+        <h3 class="mb-4">Chọn phương thức thanh toán</h3>
+        <div class="payment-methods">
+          <label class="payment-method" th:each="method : ${methods}">
+            <input type="radio" name="paymentMethod" th:value="${method.name()}" required />
+            <span th:text="${method.label}"></span>
+          </label>
+        </div>
+        <button class="btn btn-primary w-100 mt-4">
+          Thanh toán
+          <span th:text="${@display.money(booking.total)}"></span>
+        </button>
+      </form>
+      <div class="d-flex justify-content-between mt-4">
+        <a th:href="@{/bookings/{id}(id=${booking.id})}">Xem chi tiết đơn</a>
+        <form
+          th:action="@{/bookings/{id}/cancel(id=${booking.id})}"
+          method="post"
+          data-submit-lock
+          data-confirm="Hủy đơn và trả toàn bộ ghế?"
+        >
+          <input type="hidden" name="requestKey" th:value="${cancelKey}" />
+          <button class="btn btn-link text-danger p-0">Hủy đơn</button>
+        </form>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

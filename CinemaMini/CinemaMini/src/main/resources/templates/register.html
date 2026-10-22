@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Đăng ký')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space auth-wrap">
+      <section class="auth-story">
+        <p class="eyebrow">BẮT ĐẦU CUỘC HẸN</p>
+        <h1>
+          Một tài khoản.
+          <br />
+          Nhiều câu chuyện.
+        </h1>
+        <p>Tạo tài khoản để đặt vé, nhận thông báo và xem lại những vé của bạn.</p>
+      </section>
+      <section class="surface auth-card">
+        <h2>Tạo tài khoản</h2>
+        <p class="muted">Điền thông tin của bạn để bắt đầu.</p>
+        <div th:if="${message}" th:text="${message}" class="alert alert-danger"></div>
+        <form th:action="@{/register}" method="post" data-submit-lock>
+          <label class="form-label" for="fullName">Họ tên</label>
+          <input
+            class="form-control mb-3"
+            id="fullName"
+            name="fullName"
+            th:value="${fullName}"
+            maxlength="120"
+            autocomplete="name"
+            required
+          />
+          <label class="form-label" for="email">Email</label>
+          <input
+            class="form-control mb-3"
+            id="email"
+            name="email"
+            type="email"
+            th:value="${email}"
+            maxlength="254"
+            autocomplete="email"
+            required
+          />
+          <label class="form-label" for="password">Mật khẩu</label>
+          <input
+            class="form-control mb-3"
+            id="password"
+            name="password"
+            type="password"
+            minlength="8"
+            maxlength="72"
+            autocomplete="new-password"
+            required
+          />
+          <label class="form-label" for="confirmPassword">Nhập lại mật khẩu</label>
+          <input
+            class="form-control mb-4"
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            minlength="8"
+            maxlength="72"
+            autocomplete="new-password"
+            required
+          />
+          <button class="btn btn-primary w-100">Đăng ký</button>
+        </form>
+        <p class="mt-4 mb-0 muted">
+          Đã có tài khoản?
+          <a th:href="@{/login}">Đăng nhập</a>
+        </p>
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

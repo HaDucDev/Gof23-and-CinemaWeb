@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Thông báo')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space narrow-page">
+      <div class="surface p-5">
+        <p class="eyebrow">CINEMAMINI</p>
+        <h1 class="page-title">Chưa thể hoàn tất thao tác</h1>
+        <p
+          class="muted mt-3"
+          th:text="${message ?: 'Vui lòng kiểm tra thông tin hoặc thử lại sau.'}"
+        ></p>
+        <div class="d-flex gap-3 mt-4">
+          <a class="btn btn-primary" th:href="@{/movies}">Về trang phim</a>
+          <a
+            th:if="${loggedIn == true and admin != true}"
+            class="btn btn-outline-dark"
+            th:href="@{/bookings}"
+          >
+            Vé của tôi
+          </a>
+        </div>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

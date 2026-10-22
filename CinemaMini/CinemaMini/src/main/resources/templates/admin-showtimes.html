@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Quản lý suất chiếu')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: nav}"></header>
+    <main class="container page-space">
+      <p class="eyebrow">QUẢN TRỊ CINEMAMINI</p>
+      <h1 class="page-title mb-4">Quản lý suất chiếu</h1>
+      <div th:if="${param.created}" class="alert alert-success">Đã tạo suất chiếu mới từ mẫu.</div>
+      <div class="row g-4">
+        <section class="col-lg-5">
+          <form
+            class="surface p-4"
+            th:action="@{/admin/showtimes/from-template}"
+            method="post"
+            data-submit-lock
+          >
+            <h3>Tạo suất từ mẫu</h3>
+            <div class="template-note">
+              <strong th:text="${template.name}"></strong>
+              <p class="mb-0 small muted">
+                Giá gốc
+                <span th:text="${@display.money(template.pricing.basePrice)}"></span>
+                · phụ thu VIP
+                <span th:text="${@display.money(template.pricing.vipSurcharge)}"></span>
+                · 30 ghế mở bán
+              </p>
+            </div>
+            <label class="form-label" for="movieId">Phim</label>
+            <select id="movieId" name="movieId" class="form-select mb-3" required>
+              <option
+                th:each="movie : ${movies}"
+                th:value="${movie.id}"
+                th:text="${movie.title}"
+              ></option>
+            </select>
+            <label class="form-label" for="startsAt">Giờ bắt đầu (giờ Việt Nam)</label>
+            <input
+              id="startsAt"
+              name="startsAt"
+              type="datetime-local"
+              class="form-control mb-3"
+              th:value="${defaultStart}"
+              required
+            />
+            <div class="row">
+              <div class="col-6">
+                <label class="form-label" for="basePrice">Giá cơ bản (đ)</label>
+                <input
+                  id="basePrice"
+                  name="basePrice"
+                  type="number"
+                  min="1"
+                  max="9999999999999"
+                  step="1"
+                  class="form-control mb-3"
+                  th:value="${template.pricing.basePrice}"
+                  required
+                />
+              </div>
+              <div class="col-6">
+                <label class="form-label" for="vipSurcharge">Phụ thu VIP (đ)</label>
+                <input
+                  id="vipSurcharge"
+                  name="vipSurcharge"
+                  type="number"
+                  min="0"
+                  max="9999999999999"
+                  step="1"
+                  class="form-control mb-3"
+                  th:value="${template.pricing.vipSurcharge}"
+                  required
+                />
+              </div>
+            </div>
+            <p class="form-label mb-2">Ghế không mở bán trong suất mới</p>
+            <div class="admin-seat-list">
+              <label th:each="seat : ${template.seats}">
+                <input type="checkbox" name="disabledSeats" th:value="${seat.code}" />
+                <span th:text="${seat.code}"></span>
+              </label>
+            </div>
+            <p class="small muted mt-3">Thời gian dọn phòng: 20 phút sau khi phim kết thúc.</p>
+            <button class="btn btn-primary w-100">Tạo suất chiếu</button>
+          </form>
+        </section>
+        <section class="col-lg-7">
+          <div class="surface p-4">
+            <h3>Lịch chiếu</h3>
+            <div class="table-responsive">
+              <table class="table align-middle mt-3">
+                <thead>
+                  <tr>
+                    <th>Phim</th>
+                    <th>Bắt đầu</th>
+                    <th>Phòng sẵn sàng</th>
+                    <th>Giá</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="row : ${rows}">
+                    <td>
+                      <a
+                        th:href="@{/showtimes/{id}/seats(id=${row.showtime.id})}"
+                        th:text="${row.movie.title}"
+                      ></a>
+                    </td>
+                    <td th:text="${@display.date(row.showtime.startsAt)}"></td>
+                    <td th:text="${@display.time(row.showtime.roomAvailableAt)}"></td>
+                    <td>
+                      <span th:text="${@display.money(row.showtime.basePrice)}"></span>
+                      <small
+                        class="d-block muted"
+                        th:text="${'VIP +' + @display.money(row.showtime.vipSurcharge)}"
+                      ></small>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.isEmpty(rows)}">
+                    <td colspan="4" class="muted">Chưa có suất chiếu.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>
